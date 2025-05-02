@@ -11,7 +11,11 @@ import * as livekit from "@livekit/agents-plugin-livekit";
 import * as openai from "@livekit/agents-plugin-openai";
 import * as silero from "@livekit/agents-plugin-silero";
 import { fileURLToPath } from "url";
-import { salonSystemPrompt, startMessage } from "./src/Agent/constants.js";
+import {
+  model,
+  salonSystemPrompt,
+  startMessage,
+} from "./src/Agent/constants.js";
 import tools from "./src/Agent/tools.js";
 
 import dotenv from "dotenv";
@@ -36,7 +40,9 @@ export const agentDefinition = {
     const agent = new pipeline.VoicePipelineAgent(
       vad,
       new deepgram.STT(),
-      new openai.LLM(),
+      new openai.LLM({
+        model: model,
+      }),
       new openai.TTS(),
       {
         chatCtx: initialContext,
