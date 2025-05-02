@@ -73,16 +73,7 @@ const requestHumanHelp = {
       )}`
     );
 
-    const result = await createUnansweredKnowledgeQuery(question, tags);
-    if (!result.success)
-      return "I'm having trouble connecting with my supervisor. Please try again in a moment.";
-
-    const { requestId } = result;
-    console.log(
-      `[requestHumanHelp](tool): Request ID: ${requestId}, waiting for supervisor response`
-    );
-    // here we will poll the supervisor to check if they have answered the question
-    return "Let me check with my supervisor and get back to you on that. We'll contact you as soon as we have an answer.";
+    return await checkWithSupervisor(question, tags);
   },
 };
 
@@ -98,7 +89,11 @@ async function searchKnowledgeBase(query, tags) {
   return response.data;
 }
 
-async function createUnansweredKnowledgeQuery(question, tags) {
+async function checkWithSupervisor(question, tags) {
+  console.log(
+    `[For Supervisor](tool): New question from customer "${question}"`
+  );
+
   const response = await axios.post(
     `${process.env.SERVER_URL}/api/knowledge/new`,
     {
@@ -107,7 +102,45 @@ async function createUnansweredKnowledgeQuery(question, tags) {
     }
   );
 
-  // next we will build function to check if supervisor has answered the question as we recieve id of the req
+  const { requestId } = response.data;
+
+  return new Promise((resolve) => {
+    let timeoutId;
+    const interval = setInterval(async () => {
+      try {
+        const result = await getParticularKnowledge(requestId);
+        if (
+          result.success &&
+          result.data.status === "answered" &&
+          result.data.answer.length > 0
+        ) {
+          console.log(
+            `[requestHumanHelp](tool): Supervisor answered: ${result.data.answer}`
+          );
+          clearInterval(interval);
+          clearTimeout(timeoutId);
+          resolve("Supervisor answered: " + result.data.answer);
+        }
+      } catch (error) {
+        console.error("Error checking for answer:", error);
+      }
+    }, 5000);
+
+    timeoutId = setTimeout(() => {
+      clearInterval(interval);
+      console.log(
+        `[requestHumanHelp](tool): Supervisor did not respond in time, please try again later`
+      );
+      resolve("Supervisor is not available right now, please try again later");
+    }, 30000);
+  });
+}
+
+async function getParticularKnowledge(id) {
+  const response = await axios.get(
+    `${process.env.SERVER_URL}/api/knowledge/${id}/answer`
+  );
+
   return response.data;
 }
 
