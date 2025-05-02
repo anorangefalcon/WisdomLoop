@@ -14,6 +14,13 @@ export function Table({
   data: KnowledgeEntry[];
   editable?: EditableConfig | null;
 }) {
+  if (!data.length)
+    return (
+      <div className="flex justify-center items-center p-8 text-gray-400">
+        No data available
+      </div>
+    );
+
   return (
     <div className="overflow-hidden">
       <table className="w-full">
