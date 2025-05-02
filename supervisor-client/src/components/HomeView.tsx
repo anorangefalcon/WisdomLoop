@@ -49,7 +49,7 @@ export function HomeView() {
 
   const handleSaveAnswer = async () => {
     const entryId = popupData.data._id;
-    if (!entryId || savingAnswer) return;
+    if (!entryId || savingAnswer || answerText.length > 0) return;
     setSavingAnswer(true);
     try {
       await mutateKnowledge({ id: entryId, answer: answerText });
