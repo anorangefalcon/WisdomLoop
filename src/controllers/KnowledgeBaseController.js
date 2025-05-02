@@ -61,8 +61,6 @@ const createUnansweredKnowledgeQuery = async (question, tags = []) => {
 
     await newEntry.save();
 
-    console.log(`[For Supervisor]: New question from customer "${question}"`);
-
     return {
       success: true,
       message: "Query created successfully",
@@ -139,7 +137,7 @@ export const updateKnowledge = async (req, res) => {
   }
 };
 
-export const searchKnowledgeBase = async (query, tags = []) => {
+const searchKnowledgeBase = async (query, tags = []) => {
   try {
     const searchQuery = {
       status: "answered",
@@ -175,5 +173,33 @@ export const searchKnowledgeBase = async (query, tags = []) => {
       message: "Error searching knowledge base",
       data: [],
     };
+  }
+};
+
+export const searchParticularKnowledge = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const entry = await KnowledgeBase.findById(id);
+    if (!entry) {
+      return res.status(404).json({
+        success: false,
+        error: "knowledge not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: {
+        question: entry.question,
+        answer: entry.answer,
+        status: entry.status,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching entry:", error);
+    res.status(500).json({
+      success: false,
+      error: "error fetching knowledge base entry",
+    });
   }
 };
