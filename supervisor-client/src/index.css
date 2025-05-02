@@ -7,16 +7,6 @@
   }
 
   html,
-  body {
-    height: 100%;
-    width: 100%;
-  }
-
-  body {
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
   img,
   picture,
   video,
@@ -31,5 +21,9 @@
   textarea,
   select {
     font: inherit;
+  }
+
+  button:focus {
+    outline: none;
   }
 }
