@@ -5,7 +5,10 @@ import {
   useGetAllKnowledge,
   useUpdateKnowledge,
 } from "@/query-hooks/useKnowledge";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+const POLL_INTERVAL = 5000;
 
 export function HomeView() {
   const { data, isLoading } = useGetAllKnowledge();
@@ -27,9 +30,19 @@ export function HomeView() {
   }>({ visible: false, data: {} as KnowledgeEntry });
   const [answerText, setAnswerText] = useState("");
   const [savingAnswer, setSavingAnswer] = useState(false);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const refetchData = () => {
+      queryClient.invalidateQueries({ queryKey: ["knowledge"] });
+    };
+    const interval = setInterval(() => {
+      refetchData();
+    }, POLL_INTERVAL);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleOnEditAnswer = (entry: KnowledgeEntry) => {
-    console.log("Clicked on answer", entry);
     setAnswerText(entry.answer || "");
     setPopupData({ visible: true, data: entry });
   };
