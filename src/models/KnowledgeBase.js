@@ -34,19 +34,18 @@ const KnowledgeBaseSchema = new mongoose.Schema(
   }
 );
 
-// Create text indexes for backward compatibility
 KnowledgeBaseSchema.index({ question: "text", answer: "text" });
 KnowledgeBaseSchema.index({ status: 1, createdAt: -1 });
 KnowledgeBaseSchema.index({ status: 1, updatedAt: -1 });
 KnowledgeBaseSchema.index({ tags: 1 });
 
-// Add vector search index reference that matches the Atlas index name "embeddingIndex"
+// Add vector search index reference that matches the Atlas index name "embeddingIndex" (this needs to be don e at MongoDB Atlas)
 KnowledgeBaseSchema.index(
   { embedding: "vector" },
   {
-    name: "embeddingIndex", // Using the exact name you created in Atlas
+    name: "embeddingIndex",
     vector: {
-      dimensions: 1536, // For text-embedding-3-small which has 1536 dimensions
+      dimensions: 1536, // using text-embedding-3-small which has 1536 dimensions
       similarity: "cosine",
     },
   }
