@@ -19,10 +19,6 @@ export async function searchKnowledgeBase(query, tags) {
 
 export async function checkWithSupervisor(question, tags) {
   try {
-    console.log(
-      `[For Supervisor](tool): New question from customer "${question}"`
-    );
-
     const response = await axios.post(
       `${process.env.SERVER_URL}/api/knowledge/new`,
       {
@@ -43,9 +39,6 @@ export async function checkWithSupervisor(question, tags) {
             result.data.status === "answered" &&
             result.data.answer.length > 0
           ) {
-            console.log(
-              `[requestHumanHelp](tool): Supervisor answered: ${result.data.answer}`
-            );
             clearInterval(interval);
             clearTimeout(timeoutId);
             resolve("Supervisor answered: " + result.data.answer);
@@ -57,9 +50,6 @@ export async function checkWithSupervisor(question, tags) {
 
       timeoutId = setTimeout(() => {
         clearInterval(interval);
-        console.log(
-          `[requestHumanHelp](tool): Supervisor did not respond in time, please try again later`
-        );
         resolve(
           "Supervisor is not available right now, please try again later"
         );

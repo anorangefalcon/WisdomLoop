@@ -45,12 +45,16 @@ const searchKnowledge = {
     }
 
     const answer = {
+      data: result.data.map((entry) => ({
+        question: entry.question,
+        answer: entry.answer,
+        tags: entry.tags,
+      })),
       suggestion:
         "If you think data is not relevant to user's query, request human help",
-      data: result.data,
     };
     console.log(`[searchKnowledge](toolAnswer): `, answer);
-    return answer;
+    return JSON.stringify(answer);
   },
 };
 
@@ -69,12 +73,11 @@ const requestHumanHelp = {
   }),
   execute: async ({ question, tags = [] }) => {
     console.log(
-      `[requestHumanHelp](tool): Requesting help for customer: ${question}, tags: ${tags.join(
-        ", "
-      )}`
+      `[requestHumanHelp](tool): Requesting help for customer: ${question}}`
     );
 
-    return await checkWithSupervisor(question, tags);
+    const answer = await checkWithSupervisor(question, tags);
+    console.log(`[requestHumanHelp](toolAnswer): ${answer}`);
   },
 };
 

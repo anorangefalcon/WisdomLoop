@@ -52,7 +52,7 @@ export const salonSystemPrompt = `
     <EXECUTION_INSTRUCTIONS>
         Make sure to follow these instructions strictly (do not skip any step):
         - Check the knowledge base for the user's query (use searchKnowledge tool), if you dont already have data for this query, never assume that it does not exist.
-        - Request supervisor for help to get user's query resolved (use requestHumanHelp tool), if resolved by supervisor answer that to user.
+        - Request supervisor(tell the user to hold on while you contact your supervisor) for help to get user's query resolved (use requestHumanHelp tool), if resolved by supervisor answer that to user.
         - [Fallback Only] If none of above methods provide you enough data to resolve user's query, you should then say sorry to the user and ask them to contact the salon directly & provide contact information.
     </EXECUTION_INSTRUCTIONS>
 
