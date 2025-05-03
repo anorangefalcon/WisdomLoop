@@ -6,6 +6,8 @@ A human-in-the-loop system for AI agents that allows them to escalate questions 
 
 This system enables an AI receptionist for a salon to handle customer inquiries and, when it encounters questions it cannot answer, escalate them to a human supervisor. The supervisor can provide answers through a web interface, which are then stored in a knowledge base for future use.
 
+**_LiveKit's JS SDK is still in beta & has alot of issues as they have mentioned in their documentation. This project is a proof of concept and not production ready yet._**
+
 ### Key Features
 
 - **LiveKit-powered AI Agent**: Voice-based AI receptionist with natural language processing capabilities
