@@ -1,8 +1,8 @@
 import KnowledgeBase from "../models/KnowledgeBase.js";
+import EmbeddingService from "../services/EmbeddingService.js";
 
 export const getAllKnowledge = async (req, res) => {
   try {
-    // Custom sort to prioritize unanswered entries
     const entries = await KnowledgeBase.aggregate([
       {
         $addFields: {
@@ -122,6 +122,14 @@ export const updateKnowledge = async (req, res) => {
     entry.answer = answer;
     entry.status = "answered";
 
+    const embedding = await EmbeddingService.generateCombinedEmbedding(
+      entry.question,
+      answer,
+      entry.tags
+    );
+
+    entry.embedding = embedding;
+
     await entry.save();
 
     res.status(200).json({
@@ -139,38 +147,69 @@ export const updateKnowledge = async (req, res) => {
 
 const searchKnowledgeBase = async (query, tags = []) => {
   try {
-    const searchQuery = {
-      status: "answered",
-    };
-
-    if (!query && (!tags || tags.length === 0)) {
+    if (!query) {
       return {
         success: false,
-        message: "Please provide a search query or tags",
+        message: "Please provide a search query",
         data: [],
       };
     }
 
-    searchQuery.$or = [
-      { question: { $regex: query, $options: "i" } },
-      { answer: { $regex: query, $options: "i" } },
-    ];
-    searchQuery.tags = { $in: tags };
+    const maxResults = 3;
 
-    const entries = await KnowledgeBase.find(searchQuery)
-      .select("question answer")
-      .limit(3)
-      .maxTimeMS(5000);
+    const queryEmbedding = await EmbeddingService.generateEmbedding(query);
+
+    if (!queryEmbedding || queryEmbedding.length === 0) {
+      console.error("Failed to generate embedding");
+      return {
+        success: false,
+        message: "Could not generate embedding for search query",
+        data: [],
+      };
+    }
+
+    let pipeline = [
+      {
+        $search: {
+          index: "embeddingIndex",
+          knnBeta: {
+            vector: queryEmbedding,
+            path: "embedding",
+            k: maxResults,
+          },
+        },
+      },
+    ];
+
+    let matchStage = { status: "answered" };
+    pipeline.push({ $match: matchStage });
+
+    pipeline.push({
+      $project: {
+        question: 1,
+        answer: 1,
+        tags: 1,
+        score: { $meta: "searchScore" },
+        _id: 1,
+      },
+    });
+
+    const results = await KnowledgeBase.aggregate(pipeline);
+
+    console.log(`Vector search found ${results ? results.length : 0} results`);
 
     return {
       success: true,
-      data: entries,
+      data: results || [],
+      count: results ? results.length : 0,
+      query: query,
     };
   } catch (error) {
-    console.error("Error searching knowledge base:", error);
+    console.error("Error in knowledge base search:", error);
     return {
       success: false,
       message: "Error searching knowledge base",
+      error: error.message,
       data: [],
     };
   }
