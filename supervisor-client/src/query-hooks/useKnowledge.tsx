@@ -1,8 +1,8 @@
-import { SERVER_URL } from "@/constants";
 import { KnowledgeEntry } from "@/interfaces/knowledge";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
+const SERVER_URL = import.meta.env.SERVER_URL;
 const API_URL = SERVER_URL + "/api/knowledge";
 
 export const useGetAllKnowledge = () => {
