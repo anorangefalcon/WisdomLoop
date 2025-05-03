@@ -1,4 +1,4 @@
-# AI Escalation Knowledge Service
+# Wisdom Lookup: AI Escalation Knowledge Service
 
 A human-in-the-loop system for AI agents that allows them to escalate questions to human supervisors when they don't have sufficient knowledge to answer that also learns from it.
 
@@ -54,8 +54,8 @@ The project consists of three main components:
 1. Clone the repository:
 
 ```
-git clone https://github.com/anorangefalcon/ai-escalation-knowledge-service.git
-cd ai-escalation-knowledge-service
+git clone https://github.com/anorangefalcon/WisdomLoop.git
+cd WisdomLoop
 ```
 
 2. Install dependencies:
