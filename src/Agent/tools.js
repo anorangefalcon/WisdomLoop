@@ -1,5 +1,5 @@
-import axios from "axios";
 import { z } from "zod";
+import { checkWithSupervisor, searchKnowledgeBase } from "./tools.executers.js";
 
 const bookAppointment = {
   description: "Book an appointment at the salon",
@@ -41,29 +41,30 @@ const searchKnowledge = {
     const result = await searchKnowledgeBase(query, tags);
 
     if (!result.success || result.data.length === 0) {
-      return "NO data, reply : I'm sorry, but I am unsure about your question, Please hold on while I check with my supervisor. [execute requestHumanHelp tool]";
+      return "No relevant data found in the knowledge base. Ask a supervisor for help.";
     }
 
     const answer = {
-      developer:
+      suggestion:
         "If you think data is not relevant to user's query, request human help",
       data: result.data,
     };
-    return JSON.stringify(answer);
+    console.log(`[searchKnowledge](toolAnswer): `, answer);
+    return answer;
   },
 };
 
 const requestHumanHelp = {
   description:
-    "Use this tool when you don't know the answer, have already checked knowledge base & want to request help from a human supervisor",
+    "Use this tool to request help from a supervisor. This is used when the agent is unsure about the answer to a question.",
   parameters: z.object({
     question: z
       .string()
-      .describe("The customer's question to search for in the knowledge base"),
+      .describe("The customer's question to ask the supervisor"),
     tags: z
       .array(z.string())
       .describe(
-        "Tags to help narrow down the search, form tags related to the question. For example: if question is 'what is the price of a haircut', tags can be ['haircut', 'pricing']"
+        "Tags related to the question. For example: if question is 'what is the price of a haircut', tags can be ['haircut', 'pricing']"
       ),
   }),
   execute: async ({ question, tags = [] }) => {
@@ -77,75 +78,8 @@ const requestHumanHelp = {
   },
 };
 
-async function searchKnowledgeBase(query, tags) {
-  const response = await axios.post(
-    `${process.env.SERVER_URL}/api/knowledge/search`,
-    {
-      query,
-      tags,
-    }
-  );
-
-  return response.data;
-}
-
-async function checkWithSupervisor(question, tags) {
-  console.log(
-    `[For Supervisor](tool): New question from customer "${question}"`
-  );
-
-  const response = await axios.post(
-    `${process.env.SERVER_URL}/api/knowledge/new`,
-    {
-      question,
-      tags,
-    }
-  );
-
-  const { requestId } = response.data;
-
-  return new Promise((resolve) => {
-    let timeoutId;
-    const interval = setInterval(async () => {
-      try {
-        const result = await getParticularKnowledge(requestId);
-        if (
-          result.success &&
-          result.data.status === "answered" &&
-          result.data.answer.length > 0
-        ) {
-          console.log(
-            `[requestHumanHelp](tool): Supervisor answered: ${result.data.answer}`
-          );
-          clearInterval(interval);
-          clearTimeout(timeoutId);
-          resolve("Supervisor answered: " + result.data.answer);
-        }
-      } catch (error) {
-        console.error("Error checking for answer:", error);
-      }
-    }, 5000);
-
-    timeoutId = setTimeout(() => {
-      clearInterval(interval);
-      console.log(
-        `[requestHumanHelp](tool): Supervisor did not respond in time, please try again later`
-      );
-      resolve("Supervisor is not available right now, please try again later");
-    }, 30000);
-  });
-}
-
-async function getParticularKnowledge(id) {
-  const response = await axios.get(
-    `${process.env.SERVER_URL}/api/knowledge/${id}/answer`
-  );
-
-  return response.data;
-}
-
 export default {
-  bookAppointment,
   searchKnowledge,
   requestHumanHelp,
+  bookAppointment,
 };

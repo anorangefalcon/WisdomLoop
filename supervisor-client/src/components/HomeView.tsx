@@ -20,10 +20,12 @@ export function HomeView() {
     const answeredIndex = data.findIndex(
       (entry) => entry.status === "answered"
     );
+    if (answeredIndex === -1) return { answered: [], unanswered: data };
     const answered = data.slice(answeredIndex);
     const unanswered = data.slice(0, answeredIndex);
     return { answered, unanswered };
   }, [data]);
+
   const [popupData, setPopupData] = useState<{
     visible: boolean;
     data: KnowledgeEntry;
