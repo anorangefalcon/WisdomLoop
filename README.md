@@ -1,4 +1,4 @@
-# Wisdom Lookup: AI Escalation Knowledge Service
+# Wisdom Loop: AI Escalation Knowledge Service
 
 A human-in-the-loop system for AI agents that allows them to escalate questions to human supervisors when they don't have sufficient knowledge to answer that also learns from it.
 
