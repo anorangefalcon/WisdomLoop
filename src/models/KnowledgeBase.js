@@ -13,7 +13,6 @@ const KnowledgeBaseSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    // we will use this to filter the knowledge base
     tags: {
       type: [String],
       default: [],

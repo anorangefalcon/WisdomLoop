@@ -41,6 +41,9 @@ const searchKnowledge = {
     const result = await searchKnowledgeBase(query, tags);
 
     if (!result.success || result.data.length === 0) {
+      console.log(
+        `[searchKnowledge](toolAnswer): No relevant data found in the knowledge base.`
+      );
       return "No relevant data found in the knowledge base. Ask a supervisor for help.";
     }
 
@@ -78,6 +81,7 @@ const requestHumanHelp = {
 
     const answer = await checkWithSupervisor(question, tags);
     console.log(`[requestHumanHelp](toolAnswer): ${answer}`);
+    return answer;
   },
 };
 
