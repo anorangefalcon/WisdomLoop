@@ -1,54 +1,53 @@
-# React + TypeScript + Vite
+# WisdomLoop Supervisor Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The Supervisor Client is a web dashboard for human supervisors to review and answer questions that AI agents have escalated in almost real time.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This dashboard allows supervisors to:
 
-## Expanding the ESLint configuration
+- View questions submitted by AI agents that need human expertise
+- Provide answers to pending questions
+- Review previously answered questions
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **Tab-based navigation**: Switch between unanswered and answered questions
+- **Real-time polling**: Automatically checks for new questions every 5 seconds
+- **Simple editing interface**: Easily add answers to pending questions
+- **Tag support**: Questions include contextual tags for better categorization
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Technology Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Framework**: React with TypeScript
+- **Build tool**: Vite
+- **Styling**: TailwindCSS with custom CSS variables
+- **State Management**: TanStack Query for API requests
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Getting Started
+
+1. Install dependencies:
+
+   ```
+   pnpm install
+   ```
+
+2. Start the development server:
+   ```
+   pnpm dev
+   ```
+
+## Project Structure
+
+- `/src/components` - Main React components
+- `/src/elements` - Reusable UI elements (Popup, Table)
+- `/src/interfaces` - TypeScript interfaces
+- `/src/query-hooks` - API communication hooks
+
+## Integration
+
+The Supervisor Client communicates with the WisdomLoop server API to:
+
+1. Fetch pending and answered questions
+2. Submit answers to questions
+3. Keep the knowledge base synchronized
